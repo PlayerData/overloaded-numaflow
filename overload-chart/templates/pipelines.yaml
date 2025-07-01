@@ -3,7 +3,7 @@
 apiVersion: numaflow.numaproj.io/v1alpha1
 kind: Pipeline
 metadata:
-  name: overload
+  name: overload-{{$x}}
 spec:
   interStepBufferServiceName: overloaded-isbsvc
   watermark:
@@ -44,7 +44,7 @@ spec:
           operator: or
           values:
             - get_result
-    {{- if not (eq $i $vertexCount) }}
+    {{- if not (eq $i (sub $vertexCount 1)) }}
     - from: cat-{{$i}}
       to: cat-{{add1 $i}}
       conditions:
@@ -61,7 +61,7 @@ spec:
             - early_exit
     {{- end }}
     {{- end }}
-    - from: cat-{{$vertexCount}}
+    - from: cat-{{sub $vertexCount 1}}
       to: out
       values:
         - next
