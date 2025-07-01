@@ -23,7 +23,7 @@ spec:
     - name: reducer
       udf:
         container:
-          image: {{ .Values.reducer.image }}
+          image: {{ $.Values.reducer.image }}
         groupBy:
           storage:
             persistentVolumeClaim:
