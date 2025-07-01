@@ -1,0 +1,40 @@
+apiVersion: numaflow.numaproj.io/v1alpha1
+kind: InterStepBufferService
+metadata:
+  name: overloaded-isbsvc
+spec:
+  jetstream:
+    version: 2.10.7
+    replicas: 3
+    containerTemplate:
+      resources:
+        limits:
+          memory: 8194Mi
+        requests:
+          cpu: 4
+          memory: 8194Mi
+    persistence:
+      volumeSize: 50Gi
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: isbsvc
+                  numaflow.numaproj.io/isbsvc-name: default
+              topologyKey: topology.kubernetes.io/zone
+            weight: 100
+
+---
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: overloaded-isbsvc-pdb
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: isbsvc
+      numaflow.numaproj.io/isbsvc-name: overloaded-isbsvc

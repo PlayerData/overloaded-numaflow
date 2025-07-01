@@ -1,0 +1,68 @@
+{{ $vertexCount := (.Values.vertexCount | int) }}
+{{ range $x := until (.Values.pipelineCount | int) }}
+apiVersion: numaflow.numaproj.io/v1alpha1
+kind: Pipeline
+metadata:
+  name: overload
+spec:
+  interStepBufferServiceName: overloaded-isbsvc
+  watermark:
+    idleSource:
+      threshold: 5s
+      incrementBy: 2s
+      stepInterval: 3s
+  vertices:
+    - name: in
+      source:
+        generator:
+          # How many messages to generate in the duration.
+          rpu: 1
+          duration: 60m
+    {{- range $i := until $vertexCount }}
+    - name: cat-{{$i}}
+      udf:
+        container:
+          image: quay.io/numaio/numaflow-go/map-cat:stable
+    - name: cat-result-{{$i}}
+      udf:
+        container:
+          image: quay.io/numaio/numaflow-go/map-cat:stable
+    {{- end }}
+    - name: out
+      sink:
+        log: { }
+  edges:
+    - from: in
+      to: cat-1
+    {{- range $i := until $vertexCount }}
+    - from: cat-result-{{$i}}
+      to: cat-{{$i}}
+    - from: cat-{{$i}}
+      to: cat-result-{{$i}}
+      conditions:
+        tags:
+          operator: or
+          values:
+            - get_result
+    {{- if not (eq $i $vertexCount) }}
+    - from: cat-{{$i}}
+      to: cat-{{add1 $i}}
+      conditions:
+        tags:
+          operator: or
+          values:
+            - next
+    - from: cat-{{$i}}
+      to: out
+      conditions:
+        tags:
+          operator: or
+          values:
+            - early_exit
+    {{- end }}
+    {{- end }}
+    - from: cat-{{$vertexCount}}
+      to: out
+      values:
+        - next
+{{ end }}
