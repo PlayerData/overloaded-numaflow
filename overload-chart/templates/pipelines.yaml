@@ -35,7 +35,7 @@ spec:
         log: { }
   edges:
     - from: in
-      to: cat-1
+      to: cat-0
     {{- range $i := until $vertexCount }}
     - from: cat-result-{{$i}}
       to: cat-{{$i}}
