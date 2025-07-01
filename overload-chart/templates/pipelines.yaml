@@ -25,6 +25,10 @@ spec:
         container:
           image: quay.io/numaio/numaflow-go/reduce-sum:v0.5.0
         groupBy:
+          storage:
+            persistentVolumeClaim:
+              volumeSize: 1Gi
+              accessMode: ReadWriteOnce
           window:
             fixed:
               length: 5s
