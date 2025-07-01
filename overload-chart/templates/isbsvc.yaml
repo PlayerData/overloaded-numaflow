@@ -8,6 +8,9 @@ spec:
   jetstream:
     version: 2.10.29
     replicas: 3
+    settings: |
+      max_file_store: 48000m
+      max_payload: 8m
     containerTemplate:
       resources:
         limits:
