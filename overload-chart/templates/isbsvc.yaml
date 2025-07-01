@@ -2,6 +2,8 @@ apiVersion: numaflow.numaproj.io/v1alpha1
 kind: InterStepBufferService
 metadata:
   name: overloaded-isbsvc
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   jetstream:
     version: 2.10.29
@@ -32,6 +34,8 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: overloaded-isbsvc-pdb
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   maxUnavailable: 1
   selector:
