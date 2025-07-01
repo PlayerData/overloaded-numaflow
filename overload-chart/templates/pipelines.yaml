@@ -63,7 +63,10 @@ spec:
     {{- end }}
     - from: cat-{{sub $vertexCount 1}}
       to: out
-      values:
-        - next
+      conditions:
+        tags:
+          operator: or
+          values:
+            - next
 ---
 {{ end }}
