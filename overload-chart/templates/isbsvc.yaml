@@ -4,7 +4,7 @@ metadata:
   name: overloaded-isbsvc
 spec:
   jetstream:
-    version: 2.10.7
+    version: 2.10.29
     replicas: 3
     containerTemplate:
       resources:
