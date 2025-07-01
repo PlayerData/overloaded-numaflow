@@ -20,6 +20,15 @@ spec:
           # How many messages to generate in the duration.
           rpu: 1
           duration: 60m
+    - name: reducer
+      udf:
+        container:
+          image: quay.io/numaio/numaflow-go/reduce-sum:v0.5.0
+        groupBy:
+          window:
+            fixed:
+              length: 5s
+          keyed: true
     {{- range $i := until $vertexCount }}
     - name: cat-{{$i}}
       udf:
@@ -35,6 +44,8 @@ spec:
         log: { }
   edges:
     - from: in
+      to: reducer
+    - from: reducer
       to: cat-0
     {{- range $i := until $vertexCount }}
     - from: cat-result-{{$i}}
