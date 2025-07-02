@@ -52,6 +52,10 @@ spec:
     - name: out
       sink:
         log: { }
+    - name: dead
+      sink:
+        log: { }
+
   edges:
     - from: in
       to: reducer
@@ -67,6 +71,13 @@ spec:
           operator: or
           values:
             - get_result
+    - from: cat-{{$i}}
+      to: dead
+      conditions:
+        tags:
+          operator: or
+          values:
+            - error
     {{- if not (eq $i (sub $vertexCount 1)) }}
     - from: cat-{{$i}}
       to: cat-{{add1 $i}}
